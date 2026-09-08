@@ -2,107 +2,120 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
   :root{
     color-scheme: light;
-    --page:        #f9f9f7;
+    --page:        #f5f7f9;
     --surface:     #ffffff;
-    --surface-2:   #f3f2ee;
-    --ink:         #0b0b0b;
-    --ink-2:       #52514e;
-    --ink-muted:   #898781;
-    --grid:        #e1e0d9;
-    --baseline:    #c3c2b7;
-    --border:      rgba(11,11,11,0.10);
-    --accent:      #2a78d6;
-    --accent-dim:  #cde2fb;
-    --pos:         #2a78d6;
-    --neg:         #e34948;
+    --surface-2:   #eef1f5;
+    --ink:         #10161d;
+    --ink-2:       #47525e;
+    --ink-muted:   #7c8794;
+    --grid:        #e1e6eb;
+    --baseline:    #c5ccd4;
+    --border:      rgba(16,22,29,0.10);
+    --accent:      #155e99;
+    --accent-dim:  #d6e5f1;
+    --pos:         #155e99;
+    --neg:         #b0413e;
     --good-text:   #006300;
-    --crit-text:   #a32a29;
-    --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+    --crit-text:   #b0413e;
+    --s2: #c9860c; --s3: #0e8c79; --s4: #b0413e;
+    --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --font-body:    "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-mono:    "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
       color-scheme: dark;
-      --page:        #0d0d0d;
-      --surface:     #171716;
-      --surface-2:   #1f1f1d;
-      --ink:         #ffffff;
-      --ink-2:       #c3c2b7;
-      --ink-muted:   #8f8d86;
-      --grid:        #2c2c2a;
-      --baseline:    #383835;
+      --page:        #0b0f14;
+      --surface:     #151b22;
+      --surface-2:   #1c232b;
+      --ink:         #f2f4f6;
+      --ink-2:       #c1c9d1;
+      --ink-muted:   #8a94a1;
+      --grid:        #2a333c;
+      --baseline:    #3a4550;
       --border:      rgba(255,255,255,0.12);
       --accent:      #3987e5;
-      --accent-dim:  #184f95;
+      --accent-dim:  #1c3f5c;
       --pos:         #3987e5;
       --neg:         #e66767;
-      --good-text:   #0ca30c;
+      --good-text:   #3fc23f;
       --crit-text:   #e66767;
-      --s2: #d95926; --s3: #199e70; --s4: #c98500;
+      --s2: #c98500; --s3: #199e70; --s4: #e66767;
     }
   }
   :root[data-theme="dark"]{
     color-scheme: dark;
-    --page:        #0d0d0d;
-    --surface:     #171716;
-    --surface-2:   #1f1f1d;
-    --ink:         #ffffff;
-    --ink-2:       #c3c2b7;
-    --ink-muted:   #8f8d86;
-    --grid:        #2c2c2a;
-    --baseline:    #383835;
+    --page:        #0b0f14;
+    --surface:     #151b22;
+    --surface-2:   #1c232b;
+    --ink:         #f2f4f6;
+    --ink-2:       #c1c9d1;
+    --ink-muted:   #8a94a1;
+    --grid:        #2a333c;
+    --baseline:    #3a4550;
     --border:      rgba(255,255,255,0.12);
     --accent:      #3987e5;
-    --accent-dim:  #184f95;
+    --accent-dim:  #1c3f5c;
     --pos:         #3987e5;
     --neg:         #e66767;
-    --good-text:   #0ca30c;
+    --good-text:   #3fc23f;
     --crit-text:   #e66767;
-    --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --s2: #c98500; --s3: #199e70; --s4: #e66767;
   }
 
   *{ box-sizing:border-box; }
   body{
     margin:0; background:var(--page); color:var(--ink);
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-family: var(--font-body);
     font-variant-numeric: tabular-nums;
   }
-  .wrap{ max-width:1180px; margin:0 auto; padding: 20px 24px 64px; }
+  .wrap{ max-width:1180px; margin:0 auto; padding: 28px 24px 64px; }
 
   header.top{
-    display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
-    flex-wrap:wrap; padding-bottom:16px; margin-bottom:18px; border-bottom:1px solid var(--border);
+    display:flex; align-items:flex-end; justify-content:space-between; gap:24px;
+    flex-wrap:wrap; padding-bottom:18px; margin-bottom:22px;
+    border-bottom:2px solid var(--accent);
+    position:relative;
   }
   .eyebrow{
-    font-family:"Space Mono", ui-monospace, monospace; font-size:11px; letter-spacing:.09em;
-    text-transform:uppercase; color:var(--accent); margin:0 0 6px;
+    font-family:var(--font-mono); font-weight:600; font-size:11px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--accent); margin:0 0 8px;
   }
-  h1{ margin:0; font-size:26px; letter-spacing:-0.01em; text-wrap:balance; }
-  .sub{ margin:6px 0 0; color:var(--ink-2); font-size:13.5px; max-width:56ch; }
-  .meta{ text-align:right; font-size:12px; color:var(--ink-muted); line-height:1.6; }
-  .meta b{ color:var(--ink-2); font-weight:600; }
+  h1{
+    margin:0; font-family:var(--font-display); font-weight:600; font-size:29px;
+    letter-spacing:-0.005em; line-height:1.18; text-wrap:balance; color:var(--ink);
+  }
+  .sub{ margin:8px 0 0; color:var(--ink-2); font-size:13.5px; max-width:58ch; line-height:1.5; }
+  .meta{
+    text-align:right; font-size:11.5px; color:var(--ink-muted); line-height:1.7;
+    border-left:1px solid var(--border); padding-left:20px; white-space:nowrap;
+  }
+  .meta b{ color:var(--ink-2); font-weight:600; font-family:var(--font-mono); }
 
   .kpis{
-    display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:22px;
+    display:grid; grid-template-columns:repeat(5,1fr); gap:1px; margin-bottom:26px;
+    background:var(--border); border:1px solid var(--border); border-radius:10px; overflow:hidden;
   }
-  .kpi{
-    background:var(--surface); border:1px solid var(--border); border-radius:10px;
-    padding:14px 16px;
+  .kpi{ background:var(--surface); padding:15px 18px; }
+  .kpi .label{
+    font-family:var(--font-mono); font-size:10px; color:var(--ink-muted);
+    text-transform:uppercase; letter-spacing:.07em; font-weight:500;
   }
-  .kpi .label{ font-size:11px; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; }
-  .kpi .value{ font-size:22px; font-weight:700; margin-top:4px; letter-spacing:-0.01em; }
+  .kpi .value{ font-size:23px; font-weight:600; margin-top:6px; letter-spacing:-0.01em; font-family:var(--font-display); }
   .kpi .value.pos{ color:var(--good-text); }
 
   nav.tabs{
-    display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:20px;
+    display:flex; gap:2px; border-bottom:1px solid var(--border); margin-bottom:22px;
   }
   nav.tabs button{
-    font: inherit; font-size:13.5px; font-weight:600; color:var(--ink-2);
-    background:none; border:none; padding:10px 14px; cursor:pointer;
-    border-bottom:2px solid transparent; margin-bottom:-1px;
+    font-family:var(--font-body); font-size:13px; font-weight:600; color:var(--ink-2);
+    background:none; border:none; padding:11px 16px; cursor:pointer;
+    border-bottom:2px solid transparent; margin-bottom:-1px; letter-spacing:.01em;
   }
   nav.tabs button:hover{ color:var(--ink); }
   nav.tabs button.active{ color:var(--accent); border-bottom-color:var(--accent); }
@@ -118,11 +131,11 @@
   @media (max-width:860px){ .grid.cols-2, .grid.cols-3{ grid-template-columns:1fr; } }
 
   .card{
-    background:var(--surface); border:1px solid var(--border); border-radius:10px;
-    padding:16px 18px;
+    background:var(--surface); border:1px solid var(--border); border-radius:8px;
+    padding:18px 20px;
   }
-  .card h2{ margin:0 0 2px; font-size:14px; }
-  .card .desc{ margin:0 0 12px; font-size:12px; color:var(--ink-muted); }
+  .card h2{ margin:0 0 3px; font-size:14.5px; font-family:var(--font-display); font-weight:600; }
+  .card .desc{ margin:0 0 14px; font-size:12px; color:var(--ink-muted); line-height:1.5; max-width:62ch; }
   .card.span2{ grid-column: span 2; }
   @media (max-width:860px){ .card.span2{ grid-column: span 1; } }
 
@@ -134,11 +147,12 @@
   .callout.crit{ border-left:3px solid var(--neg); }
   .callout.good{ border-left:3px solid var(--pos); }
 
-  svg.chart{ display:block; width:100%; height:auto; overflow:visible; }
+  svg.chart{ display:block; width:100%; height:auto; overflow:visible; font-family:var(--font-body); }
   .grid-line{ stroke:var(--grid); stroke-width:1; }
-  .baseline{ stroke:var(--baseline); stroke-width:1; }
-  .axis-label{ fill:var(--ink-muted); font-size:10.5px; }
-  .bar-label{ fill:var(--ink-2); font-size:10.5px; font-weight:600; }
+  .baseline{ stroke:var(--baseline); stroke-width:1.25; }
+  .axis-label{ fill:var(--ink-muted); font-size:10px; font-family:var(--font-mono); }
+  .bar-label{ fill:var(--ink-2); font-size:10.5px; font-weight:600; font-family:var(--font-mono); }
+  .bar-label-inset{ fill:#ffffff; }
   .bar-name{ fill:var(--ink); font-size:11.5px; }
 
   .bar-rect{ cursor:pointer; }
@@ -146,8 +160,9 @@
 
   table.data{ width:100%; border-collapse:collapse; font-size:12.5px; }
   table.data th{
-    text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em;
-    color:var(--ink-muted); font-weight:600; padding:0 10px 8px 0; border-bottom:1px solid var(--border);
+    text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:.05em;
+    font-family:var(--font-mono); color:var(--ink-muted); font-weight:500; padding:0 10px 9px 0;
+    border-bottom:1px solid var(--border);
   }
   table.data td{ padding:7px 10px 7px 0; border-bottom:1px solid var(--grid); color:var(--ink-2); }
   table.data td:first-child, table.data th:first-child{ padding-left:0; }
@@ -173,12 +188,12 @@
     <div>
       <p class="eyebrow">Retail Sales Profitability Analysis</p>
       <h1>Superstore — where is profit actually leaking?</h1>
-      <p class="sub">SQL business questions answered against the real Kaggle Superstore dataset, visualized here as a Power BI-style dashboard.</p>
+      <p class="sub">SQL answers seven business questions against the real Kaggle Superstore dataset; this dashboard is the interactive layer on top of that analysis.</p>
     </div>
     <div class="meta">
       Dataset: <b>Sample — Superstore</b> (Kaggle)<br>
       9,994 orders · <b>2014–2017</b> · United States<br>
-      Built with MySQL + this dashboard
+      MySQL + hand-built dashboard
     </div>
   </header>
 
@@ -303,6 +318,7 @@ function showTip(x,y,html){
   tip.style.top = (y - r.height - 12) + 'px';
 }
 function hideTip(){ tip.style.opacity = 0; }
+
 // ---------- KPI strip ----------
 (function(){
   const t = DATA.totals;
@@ -337,12 +353,16 @@ function hBarDiverging(containerId, rows, {valueFmt=fmt.pct, height=22, gap=8, l
     const isNeg = r.value < 0;
     const x = isNeg ? zeroX - w : zeroX;
     const color = isNeg ? 'var(--neg)' : 'var(--pos)';
-    const labelX = isNeg ? x - 8 : x + w + 8;
-    const anchor = isNeg ? 'end' : 'start';
+    // outside-the-bar placement can crash into the row label when a bar spans
+    // most of its half-width — fall back to an inset label on the bar itself
+    const outsideFits = isNeg ? (x - 8 - 42 > padL) : (x + w + 8 + 42 < W - padR + 50);
+    const labelX = outsideFits ? (isNeg ? x - 8 : x + w + 8) : (isNeg ? x + 8 : x + w - 8);
+    const anchor = outsideFits ? (isNeg ? 'end' : 'start') : (isNeg ? 'start' : 'end');
+    const labelClass = outsideFits ? 'bar-label' : 'bar-label bar-label-inset';
     bars += `
       <text class="bar-name" x="${padL-10}" y="${y+height/2+4}" text-anchor="end">${r.label}</text>
       <rect class="bar-rect" data-i="${i}" x="${x}" y="${y+2}" width="${Math.max(w,2)}" height="${height-4}" rx="3" fill="${color}"></rect>
-      <text class="bar-label" x="${labelX}" y="${y+height/2+4}" text-anchor="${anchor}">${valueFmt(r.value)}</text>
+      <text class="${labelClass}" x="${labelX}" y="${y+height/2+4}" text-anchor="${anchor}">${valueFmt(r.value)}</text>
     `;
   });
 
@@ -359,6 +379,7 @@ function hBarDiverging(containerId, rows, {valueFmt=fmt.pct, height=22, gap=8, l
     rect.addEventListener('mouseleave', hideTip);
   });
 }
+
 // ================= generic vertical bar chart (single hue, magnitude) =================
 function vBarSingle(containerId, rows, {valueFmt=v=>v, colorVar='--accent', height=220, tickFmt=v=>v} = {}){
   const el = document.getElementById(containerId);
@@ -488,6 +509,7 @@ function lineChart(containerId, points, {valueFmt=v=>v, height=170, colorVar='--
     dot.addEventListener('mouseleave', hideTip);
   });
 }
+
 // ---------- build: Overview ----------
 lineChart('chart-sales-trend', DATA.monthly.map(m=>({label:m.ym.slice(2), value:m.sales})), {valueFmt:fmt.moneyK, colorVar:'--accent'});
 lineChart('chart-profit-trend', DATA.monthly.map(m=>({label:m.ym.slice(2), value:m.profit})), {valueFmt:fmt.moneyK, colorVar:'--s3'});
@@ -496,6 +518,7 @@ lineChart('chart-profit-trend', DATA.monthly.map(m=>({label:m.ym.slice(2), value
 hBarDiverging('chart-subcat', DATA.subcat.map(r=>({
   label:r.sub_category, value:r.margin, sub:`${fmt.money(r.sales)} sales · ${fmt.money(r.profit)} profit`
 })), {valueFmt:fmt.pct, height:20, gap:7, labelWidth:110});
+
 (function(){
   const el = document.getElementById('table-region-cat');
   const rows = DATA.region_category.slice().sort((a,b)=>a.profit-b.profit);
@@ -522,6 +545,7 @@ hBarDiverging('chart-subcat', DATA.subcat.map(r=>({
     </tr>`).join('')}
     </tbody></table>`;
 })();
+
 // ---------- build: Discounting ----------
 hBarDiverging('chart-discount', DATA.discount_tiers.map(r=>({
   label:r.tier, value:r.margin, sub:`${r.n.toLocaleString()} orders · ${fmt.money(r.sales)} sales`
@@ -533,6 +557,7 @@ vBarCategorical('chart-segment', DATA.segment.map(r=>({label:r.segment, value:r.
 
 vBarSingle('chart-shipmode', DATA.ship_mode.map(r=>({label:r.mode.replace(' Class',''), value:r.avg_days, sub:`${r.n.toLocaleString()} orders`})),
   {valueFmt:v=>v.toFixed(1)+'d', tickFmt:v=>v.toFixed(0)+'d', colorVar:'--accent'});
+
 (function(){
   const el = document.getElementById('table-customers');
   el.innerHTML = `<table class="data"><thead><tr>
