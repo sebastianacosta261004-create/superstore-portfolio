@@ -1,0 +1,549 @@
+<title>Superstore Profitability</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --page:        #f9f9f7;
+    --surface:     #ffffff;
+    --surface-2:   #f3f2ee;
+    --ink:         #0b0b0b;
+    --ink-2:       #52514e;
+    --ink-muted:   #898781;
+    --grid:        #e1e0d9;
+    --baseline:    #c3c2b7;
+    --border:      rgba(11,11,11,0.10);
+    --accent:      #2a78d6;
+    --accent-dim:  #cde2fb;
+    --pos:         #2a78d6;
+    --neg:         #e34948;
+    --good-text:   #006300;
+    --crit-text:   #a32a29;
+    --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --page:        #0d0d0d;
+      --surface:     #171716;
+      --surface-2:   #1f1f1d;
+      --ink:         #ffffff;
+      --ink-2:       #c3c2b7;
+      --ink-muted:   #8f8d86;
+      --grid:        #2c2c2a;
+      --baseline:    #383835;
+      --border:      rgba(255,255,255,0.12);
+      --accent:      #3987e5;
+      --accent-dim:  #184f95;
+      --pos:         #3987e5;
+      --neg:         #e66767;
+      --good-text:   #0ca30c;
+      --crit-text:   #e66767;
+      --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --page:        #0d0d0d;
+    --surface:     #171716;
+    --surface-2:   #1f1f1d;
+    --ink:         #ffffff;
+    --ink-2:       #c3c2b7;
+    --ink-muted:   #8f8d86;
+    --grid:        #2c2c2a;
+    --baseline:    #383835;
+    --border:      rgba(255,255,255,0.12);
+    --accent:      #3987e5;
+    --accent-dim:  #184f95;
+    --pos:         #3987e5;
+    --neg:         #e66767;
+    --good-text:   #0ca30c;
+    --crit-text:   #e66767;
+    --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--page); color:var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  .wrap{ max-width:1180px; margin:0 auto; padding: 20px 24px 64px; }
+
+  header.top{
+    display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+    flex-wrap:wrap; padding-bottom:16px; margin-bottom:18px; border-bottom:1px solid var(--border);
+  }
+  .eyebrow{
+    font-family:"Space Mono", ui-monospace, monospace; font-size:11px; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--accent); margin:0 0 6px;
+  }
+  h1{ margin:0; font-size:26px; letter-spacing:-0.01em; text-wrap:balance; }
+  .sub{ margin:6px 0 0; color:var(--ink-2); font-size:13.5px; max-width:56ch; }
+  .meta{ text-align:right; font-size:12px; color:var(--ink-muted); line-height:1.6; }
+  .meta b{ color:var(--ink-2); font-weight:600; }
+
+  .kpis{
+    display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:22px;
+  }
+  .kpi{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:14px 16px;
+  }
+  .kpi .label{ font-size:11px; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.06em; }
+  .kpi .value{ font-size:22px; font-weight:700; margin-top:4px; letter-spacing:-0.01em; }
+  .kpi .value.pos{ color:var(--good-text); }
+
+  nav.tabs{
+    display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:20px;
+  }
+  nav.tabs button{
+    font: inherit; font-size:13.5px; font-weight:600; color:var(--ink-2);
+    background:none; border:none; padding:10px 14px; cursor:pointer;
+    border-bottom:2px solid transparent; margin-bottom:-1px;
+  }
+  nav.tabs button:hover{ color:var(--ink); }
+  nav.tabs button.active{ color:var(--accent); border-bottom-color:var(--accent); }
+  nav.tabs button:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  section.page{ display:none; }
+  section.page.active{ display:block; animation:fadein .18s ease; }
+  @keyframes fadein{ from{opacity:0} to{opacity:1} }
+
+  .grid{ display:grid; gap:14px; }
+  .grid.cols-2{ grid-template-columns:1fr 1fr; }
+  .grid.cols-3{ grid-template-columns:repeat(3,1fr); }
+  @media (max-width:860px){ .grid.cols-2, .grid.cols-3{ grid-template-columns:1fr; } }
+
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:16px 18px;
+  }
+  .card h2{ margin:0 0 2px; font-size:14px; }
+  .card .desc{ margin:0 0 12px; font-size:12px; color:var(--ink-muted); }
+  .card.span2{ grid-column: span 2; }
+  @media (max-width:860px){ .card.span2{ grid-column: span 1; } }
+
+  .callout{
+    background:var(--surface-2); border:1px solid var(--border); border-radius:10px;
+    padding:14px 18px; font-size:13px; color:var(--ink-2); line-height:1.55;
+  }
+  .callout b{ color:var(--ink); }
+  .callout.crit{ border-left:3px solid var(--neg); }
+  .callout.good{ border-left:3px solid var(--pos); }
+
+  svg.chart{ display:block; width:100%; height:auto; overflow:visible; }
+  .grid-line{ stroke:var(--grid); stroke-width:1; }
+  .baseline{ stroke:var(--baseline); stroke-width:1; }
+  .axis-label{ fill:var(--ink-muted); font-size:10.5px; }
+  .bar-label{ fill:var(--ink-2); font-size:10.5px; font-weight:600; }
+  .bar-name{ fill:var(--ink); font-size:11.5px; }
+
+  .bar-rect{ cursor:pointer; }
+  .hover-target{ fill:transparent; }
+
+  table.data{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  table.data th{
+    text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--ink-muted); font-weight:600; padding:0 10px 8px 0; border-bottom:1px solid var(--border);
+  }
+  table.data td{ padding:7px 10px 7px 0; border-bottom:1px solid var(--grid); color:var(--ink-2); }
+  table.data td:first-child, table.data th:first-child{ padding-left:0; }
+  table.data td.num, table.data th.num{ text-align:right; }
+  table.data tr:last-child td{ border-bottom:none; }
+  table.data td.name{ color:var(--ink); font-weight:500; }
+  .neg-text{ color:var(--crit-text); font-weight:600; }
+  .pos-text{ color:var(--good-text); font-weight:600; }
+
+  .tooltip{
+    position:fixed; pointer-events:none; background:var(--ink); color:var(--page);
+    font-size:11.5px; padding:6px 9px; border-radius:6px; z-index:50; opacity:0;
+    transition:opacity .08s; white-space:nowrap; box-shadow:0 4px 14px rgba(0,0,0,.2);
+  }
+  .tooltip b{ font-weight:700; }
+
+  footer.note{ margin-top:26px; font-size:11.5px; color:var(--ink-muted); line-height:1.6; }
+  footer.note a{ color:var(--accent); }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Retail Sales Profitability Analysis</p>
+      <h1>Superstore — where is profit actually leaking?</h1>
+      <p class="sub">SQL business questions answered against the real Kaggle Superstore dataset, visualized here as a Power BI-style dashboard.</p>
+    </div>
+    <div class="meta">
+      Dataset: <b>Sample — Superstore</b> (Kaggle)<br>
+      9,994 orders · <b>2014–2017</b> · United States<br>
+      Built with MySQL + this dashboard
+    </div>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <nav class="tabs" id="tabs">
+    <button data-page="overview" class="active">Overview</button>
+    <button data-page="product">Product Profitability</button>
+    <button data-page="discount">Discounting Impact</button>
+    <button data-page="customers">Customers &amp; Fulfillment</button>
+  </nav>
+
+  <section class="page active" id="page-overview">
+    <div class="grid cols-2" style="margin-bottom:14px;">
+      <div class="card span2">
+        <h2>Monthly sales trend</h2>
+        <p class="desc">Total order value by month, Jan 2014 – Dec 2017. Strong Nov/Dec seasonality every year.</p>
+        <div id="chart-sales-trend"></div>
+      </div>
+      <div class="card span2">
+        <h2>Monthly profit trend</h2>
+        <p class="desc">Profit doesn't track sales 1:1 — several high-sales months (Jul '14, Jan '15) post a loss.</p>
+        <div id="chart-profit-trend"></div>
+      </div>
+    </div>
+    <div class="callout crit">
+      <b>Headline finding:</b> total sales are $2.30M with only $286K in profit — a 12.5% margin. The gap isn't random: it traces to three specific levers, one per tab above — a handful of loss-making product lines, discounts past 30%, and ten states that lose money despite real sales volume.
+    </div>
+  </section>
+
+  <section class="page" id="page-product">
+    <div class="grid cols-2">
+      <div class="card span2">
+        <h2>Profit margin % by sub-category</h2>
+        <p class="desc">Sorted worst → best. Tables and Bookcases are net losses despite being top-5 in sales — the classic "growth trap."</p>
+        <div id="chart-subcat"></div>
+      </div>
+      <div class="card">
+        <h2>Region × Category profit</h2>
+        <p class="desc">Only one combination is outright unprofitable — but margins vary a lot beneath the surface.</p>
+        <div id="table-region-cat"></div>
+      </div>
+      <div class="card">
+        <h2>States losing money</h2>
+        <p class="desc">10 states post a net loss despite meaningful sales — Texas is the single worst market in the dataset.</p>
+        <div id="table-states"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-discount">
+    <div class="grid cols-2">
+      <div class="card span2">
+        <h2>Profit margin % by discount tier</h2>
+        <p class="desc">The relationship is almost linear — every step up in discount trades margin away.</p>
+        <div id="chart-discount"></div>
+      </div>
+      <div class="card span2">
+        <div class="callout crit">
+          <b>This is the single highest-leverage fix in the dataset:</b> orders with no discount run a healthy 29.5% margin. Once discounts pass 30%, margin flips to <b>-48.2%</b> — those orders lose money on every dollar of sales. Capping standard discounts at 15% (12.8% margin, still positive) would protect the vast majority of at-risk revenue.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-customers">
+    <div class="grid cols-2">
+      <div class="card">
+        <h2>Profitability by customer segment</h2>
+        <p class="desc">Home Office has the fewest customers but the best margin — Consumer has the most volume and the thinnest margin.</p>
+        <div id="chart-segment"></div>
+      </div>
+      <div class="card">
+        <h2>Avg. delivery days by ship mode</h2>
+        <p class="desc">Same Day ships same-day, as promised. Standard Class averages 5 days.</p>
+        <div id="chart-shipmode"></div>
+      </div>
+      <div class="card span2">
+        <h2>Top 10 customers by profit contribution</h2>
+        <p class="desc">Ranked by actual profit, not order count — volume and profitability don't always line up.</p>
+        <div id="table-customers"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="note">
+    Source: <a href="https://www.kaggle.com/datasets/vivek468/superstore-dataset-final" target="_blank" rel="noopener">Superstore Dataset, Kaggle</a> (originally published by Tableau). SQL schema, import scripts and full query set are in the project repo.
+  </footer>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const DATA = {"subcat": [{"category": "Furniture", "sub_category": "Tables", "sales": 206966.0, "profit": -17725.0, "margin": -8.6}, {"category": "Furniture", "sub_category": "Bookcases", "sales": 114880.0, "profit": -3473.0, "margin": -3.0}, {"category": "Office Supplies", "sub_category": "Supplies", "sales": 46674.0, "profit": -1189.0, "margin": -2.5}, {"category": "Technology", "sub_category": "Machines", "sales": 189239.0, "profit": 3385.0, "margin": 1.8}, {"category": "Furniture", "sub_category": "Chairs", "sales": 328449.0, "profit": 26590.0, "margin": 8.1}, {"category": "Office Supplies", "sub_category": "Storage", "sales": 223844.0, "profit": 21279.0, "margin": 9.5}, {"category": "Technology", "sub_category": "Phones", "sales": 330007.0, "profit": 44516.0, "margin": 13.5}, {"category": "Furniture", "sub_category": "Furnishings", "sales": 91705.0, "profit": 13059.0, "margin": 14.2}, {"category": "Office Supplies", "sub_category": "Binders", "sales": 203413.0, "profit": 30222.0, "margin": 14.9}, {"category": "Office Supplies", "sub_category": "Appliances", "sales": 107532.0, "profit": 18138.0, "margin": 16.9}, {"category": "Office Supplies", "sub_category": "Art", "sales": 27119.0, "profit": 6528.0, "margin": 24.1}, {"category": "Technology", "sub_category": "Accessories", "sales": 167380.0, "profit": 41937.0, "margin": 25.1}, {"category": "Office Supplies", "sub_category": "Fasteners", "sales": 3024.0, "profit": 950.0, "margin": 31.4}, {"category": "Technology", "sub_category": "Copiers", "sales": 149528.0, "profit": 55618.0, "margin": 37.2}, {"category": "Office Supplies", "sub_category": "Envelopes", "sales": 16476.0, "profit": 6964.0, "margin": 42.3}, {"category": "Office Supplies", "sub_category": "Paper", "sales": 78479.0, "profit": 34054.0, "margin": 43.4}, {"category": "Office Supplies", "sub_category": "Labels", "sales": 12486.0, "profit": 5546.0, "margin": 44.4}], "region_category": [{"region": "Central", "category": "Furniture", "sales": 163797.0, "profit": -2871.0, "margin": -1.8}, {"region": "East", "category": "Furniture", "sales": 208291.0, "profit": 3046.0, "margin": 1.5}, {"region": "West", "category": "Furniture", "sales": 252613.0, "profit": 11505.0, "margin": 4.6}, {"region": "Central", "category": "Office Supplies", "sales": 167026.0, "profit": 8880.0, "margin": 5.3}, {"region": "South", "category": "Furniture", "sales": 117299.0, "profit": 6771.0, "margin": 5.8}, {"region": "South", "category": "Technology", "sales": 148772.0, "profit": 19992.0, "margin": 13.4}, {"region": "South", "category": "Office Supplies", "sales": 125651.0, "profit": 19986.0, "margin": 15.9}, {"region": "West", "category": "Technology", "sales": 251992.0, "profit": 44304.0, "margin": 17.6}, {"region": "East", "category": "Technology", "sales": 264974.0, "profit": 47462.0, "margin": 17.9}, {"region": "Central", "category": "Technology", "sales": 170416.0, "profit": 33697.0, "margin": 19.8}, {"region": "East", "category": "Office Supplies", "sales": 205516.0, "profit": 41015.0, "margin": 20.0}, {"region": "West", "category": "Office Supplies", "sales": 220853.0, "profit": 52610.0, "margin": 23.8}], "discount_tiers": [{"tier": "0% (no discount)", "n": 4798, "sales": 1087908.0, "profit": 320988.0, "margin": 29.5}, {"tier": "1-15%", "n": 146, "sales": 81928.0, "profit": 10448.0, "margin": 12.8}, {"tier": "16-30%", "n": 3884, "sales": 867821.0, "profit": 79968.0, "margin": 9.2}, {"tier": "31%+", "n": 1166, "sales": 259543.0, "profit": -125007.0, "margin": -48.2}], "top_customers": [{"name": "Tamara Chand", "orders": 5, "sales": 19052.0, "profit": 8981.0}, {"name": "Raymond Buch", "orders": 6, "sales": 15117.0, "profit": 6976.0}, {"name": "Sanjit Chand", "orders": 9, "sales": 14142.0, "profit": 5757.0}, {"name": "Hunter Lopez", "orders": 6, "sales": 12873.0, "profit": 5622.0}, {"name": "Adrian Barton", "orders": 10, "sales": 14474.0, "profit": 5445.0}, {"name": "Tom Ashbrook", "orders": 4, "sales": 14596.0, "profit": 4704.0}, {"name": "Christopher Martinez", "orders": 4, "sales": 8954.0, "profit": 3900.0}, {"name": "Keith Dawkins", "orders": 12, "sales": 8181.0, "profit": 3039.0}, {"name": "Andy Reiter", "orders": 6, "sales": 6608.0, "profit": 2885.0}, {"name": "Daniel Raglin", "orders": 8, "sales": 8351.0, "profit": 2869.0}], "ship_mode": [{"mode": "Same Day", "n": 543, "avg_days": 0.04}, {"mode": "First Class", "n": 1538, "avg_days": 2.18}, {"mode": "Second Class", "n": 1945, "avg_days": 3.24}, {"mode": "Standard Class", "n": 5968, "avg_days": 5.01}], "monthly": [{"ym": "2014-01", "sales": 14237.0, "profit": 2450.0}, {"ym": "2014-02", "sales": 4520.0, "profit": 862.0}, {"ym": "2014-03", "sales": 55691.0, "profit": 499.0}, {"ym": "2014-04", "sales": 28295.0, "profit": 3489.0}, {"ym": "2014-05", "sales": 23648.0, "profit": 2739.0}, {"ym": "2014-06", "sales": 34595.0, "profit": 4977.0}, {"ym": "2014-07", "sales": 33946.0, "profit": -841.0}, {"ym": "2014-08", "sales": 27909.0, "profit": 5318.0}, {"ym": "2014-09", "sales": 81777.0, "profit": 8328.0}, {"ym": "2014-10", "sales": 31453.0, "profit": 3448.0}, {"ym": "2014-11", "sales": 78629.0, "profit": 9292.0}, {"ym": "2014-12", "sales": 69546.0, "profit": 8984.0}, {"ym": "2015-01", "sales": 18174.0, "profit": -3281.0}, {"ym": "2015-02", "sales": 11951.0, "profit": 2814.0}, {"ym": "2015-03", "sales": 38726.0, "profit": 9732.0}, {"ym": "2015-04", "sales": 34195.0, "profit": 4187.0}, {"ym": "2015-05", "sales": 30132.0, "profit": 4668.0}, {"ym": "2015-06", "sales": 24797.0, "profit": 3336.0}, {"ym": "2015-07", "sales": 28765.0, "profit": 3289.0}, {"ym": "2015-08", "sales": 36898.0, "profit": 5356.0}, {"ym": "2015-09", "sales": 64596.0, "profit": 8209.0}, {"ym": "2015-10", "sales": 31405.0, "profit": 2817.0}, {"ym": "2015-11", "sales": 75973.0, "profit": 12475.0}, {"ym": "2015-12", "sales": 74920.0, "profit": 8017.0}, {"ym": "2016-01", "sales": 18542.0, "profit": 2825.0}, {"ym": "2016-02", "sales": 22979.0, "profit": 5005.0}, {"ym": "2016-03", "sales": 51716.0, "profit": 3612.0}, {"ym": "2016-04", "sales": 38750.0, "profit": 2978.0}, {"ym": "2016-05", "sales": 56988.0, "profit": 8662.0}, {"ym": "2016-06", "sales": 40345.0, "profit": 4750.0}, {"ym": "2016-07", "sales": 39262.0, "profit": 4433.0}, {"ym": "2016-08", "sales": 31115.0, "profit": 2062.0}, {"ym": "2016-09", "sales": 73410.0, "profit": 9329.0}, {"ym": "2016-10", "sales": 59688.0, "profit": 16243.0}, {"ym": "2016-11", "sales": 79412.0, "profit": 4011.0}, {"ym": "2016-12", "sales": 96999.0, "profit": 17885.0}, {"ym": "2017-01", "sales": 43971.0, "profit": 7140.0}, {"ym": "2017-02", "sales": 20301.0, "profit": 1614.0}, {"ym": "2017-03", "sales": 58872.0, "profit": 14752.0}, {"ym": "2017-04", "sales": 36522.0, "profit": 933.0}, {"ym": "2017-05", "sales": 44261.0, "profit": 6343.0}, {"ym": "2017-06", "sales": 52982.0, "profit": 8223.0}, {"ym": "2017-07", "sales": 45264.0, "profit": 6953.0}, {"ym": "2017-08", "sales": 63121.0, "profit": 9041.0}, {"ym": "2017-09", "sales": 87867.0, "profit": 10992.0}, {"ym": "2017-10", "sales": 77777.0, "profit": 9275.0}, {"ym": "2017-11", "sales": 118448.0, "profit": 9690.0}, {"ym": "2017-12", "sales": 83829.0, "profit": 8483.0}], "states": [{"state": "Texas", "region": "Central", "sales": 170188.0, "profit": -25729.0}, {"state": "Ohio", "region": "East", "sales": 78258.0, "profit": -16971.0}, {"state": "Pennsylvania", "region": "East", "sales": 116512.0, "profit": -15560.0}, {"state": "Illinois", "region": "Central", "sales": 80166.0, "profit": -12608.0}, {"state": "North Carolina", "region": "South", "sales": 55603.0, "profit": -7491.0}, {"state": "Colorado", "region": "West", "sales": 32108.0, "profit": -6528.0}, {"state": "Tennessee", "region": "South", "sales": 30662.0, "profit": -5342.0}, {"state": "Arizona", "region": "West", "sales": 35282.0, "profit": -3428.0}, {"state": "Florida", "region": "South", "sales": 89474.0, "profit": -3399.0}, {"state": "Oregon", "region": "West", "sales": 17431.0, "profit": -1190.0}], "segment": [{"segment": "Consumer", "sales": 1161401.0, "profit": 134119.0, "margin": 11.5, "customers": 409}, {"segment": "Corporate", "sales": 706146.0, "profit": 91979.0, "margin": 13.0, "customers": 236}, {"segment": "Home Office", "sales": 429653.0, "profit": 60299.0, "margin": 14.0, "customers": 148}], "totals": {"sales": 2297201.0, "profit": 286397.0, "margin": 12.5, "orders": 5009, "customers": 793}};
+
+const fmt = {
+  money: v => (v<0?'-':'') + '$' + Math.abs(v).toLocaleString('en-US', {maximumFractionDigits:0}),
+  moneyK: v => {
+    const a = Math.abs(v);
+    const s = a>=1000 ? (a/1000).toLocaleString('en-US',{maximumFractionDigits:1})+'K' : a.toLocaleString('en-US');
+    return (v<0?'-$':'$') + s;
+  },
+  pct: v => (v>0?'+':'') + v.toFixed(1) + '%',
+  num: v => v.toLocaleString('en-US')
+};
+
+// ---------- tabs ----------
+const tabs = document.getElementById('tabs');
+tabs.addEventListener('click', e=>{
+  const btn = e.target.closest('button[data-page]');
+  if(!btn) return;
+  tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('active', b===btn));
+  document.querySelectorAll('section.page').forEach(p=>p.classList.toggle('active', p.id === 'page-'+btn.dataset.page));
+});
+
+// ---------- tooltip ----------
+const tip = document.getElementById('tooltip');
+function showTip(x,y,html){
+  tip.innerHTML = html; tip.style.opacity = 1;
+  const r = tip.getBoundingClientRect();
+  tip.style.left = Math.min(x+12, window.innerWidth - r.width - 10) + 'px';
+  tip.style.top = (y - r.height - 12) + 'px';
+}
+function hideTip(){ tip.style.opacity = 0; }
+// ---------- KPI strip ----------
+(function(){
+  const t = DATA.totals;
+  const el = document.getElementById('kpis');
+  const items = [
+    ['Total sales', fmt.money(t.sales), false],
+    ['Total profit', fmt.money(t.profit), true],
+    ['Profit margin', fmt.pct(t.margin), true],
+    ['Orders', fmt.num(t.orders), false],
+    ['Customers', fmt.num(t.customers), false],
+  ];
+  el.innerHTML = items.map(([label,val,pos])=>`
+    <div class="kpi"><div class="label">${label}</div><div class="value${pos?' pos':''}">${val}</div></div>
+  `).join('');
+})();
+
+// ================= generic horizontal diverging bar chart =================
+// rows: [{label, value}], value can be + or -
+function hBarDiverging(containerId, rows, {valueFmt=fmt.pct, height=22, gap=8, labelWidth=150} = {}){
+  const el = document.getElementById(containerId);
+  const W = 900, padL = labelWidth, padR = 60;
+  const max = Math.max(...rows.map(r=>Math.abs(r.value)), 0.001);
+  const plotW = W - padL - padR;
+  const H = rows.length * (height+gap) + 10;
+  const zeroX = padL + plotW/2;
+  const scale = (plotW/2) / max;
+
+  let bars = '';
+  rows.forEach((r,i)=>{
+    const y = i*(height+gap);
+    const w = Math.abs(r.value) * scale;
+    const isNeg = r.value < 0;
+    const x = isNeg ? zeroX - w : zeroX;
+    const color = isNeg ? 'var(--neg)' : 'var(--pos)';
+    const labelX = isNeg ? x - 8 : x + w + 8;
+    const anchor = isNeg ? 'end' : 'start';
+    bars += `
+      <text class="bar-name" x="${padL-10}" y="${y+height/2+4}" text-anchor="end">${r.label}</text>
+      <rect class="bar-rect" data-i="${i}" x="${x}" y="${y+2}" width="${Math.max(w,2)}" height="${height-4}" rx="3" fill="${color}"></rect>
+      <text class="bar-label" x="${labelX}" y="${y+height/2+4}" text-anchor="${anchor}">${valueFmt(r.value)}</text>
+    `;
+  });
+
+  const svg = `
+    <svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Diverging bar chart">
+      <line class="baseline" x1="${zeroX}" y1="0" x2="${zeroX}" y2="${H-10}"></line>
+      ${bars}
+    </svg>`;
+  el.innerHTML = svg;
+
+  el.querySelectorAll('.bar-rect').forEach(rect=>{
+    const r = rows[+rect.dataset.i];
+    rect.addEventListener('mousemove', e=>showTip(e.clientX, e.clientY, `<b>${r.label}</b><br>${valueFmt(r.value)}${r.sub? '<br>'+r.sub:''}`));
+    rect.addEventListener('mouseleave', hideTip);
+  });
+}
+// ================= generic vertical bar chart (single hue, magnitude) =================
+function vBarSingle(containerId, rows, {valueFmt=v=>v, colorVar='--accent', height=220, tickFmt=v=>v} = {}){
+  const el = document.getElementById(containerId);
+  const W = 620, padL = 46, padR = 10, padT = 10, padB = 28;
+  const plotW = W - padL - padR, plotH = height - padT - padB;
+  const max = Math.max(...rows.map(r=>r.value)) * 1.15;
+  const bw = plotW / rows.length;
+  const gridN = 4;
+
+  let grid = '';
+  for(let g=0; g<=gridN; g++){
+    const y = padT + plotH - (g/gridN)*plotH;
+    grid += `<line class="grid-line" x1="${padL}" y1="${y}" x2="${padL+plotW}" y2="${y}"></line>
+      <text class="axis-label" x="${padL-8}" y="${y+3}" text-anchor="end">${tickFmt(max*g/gridN)}</text>`;
+  }
+
+  let bars = '';
+  rows.forEach((r,i)=>{
+    const bh = (r.value/max) * plotH;
+    const x = padL + i*bw + bw*0.18;
+    const w = bw*0.64;
+    const y = padT + plotH - bh;
+    bars += `
+      <rect class="bar-rect" data-i="${i}" x="${x}" y="${y}" width="${w}" height="${Math.max(bh,2)}" rx="3" fill="var(${colorVar})"></rect>
+      <text class="bar-label" x="${x+w/2}" y="${y-6}" text-anchor="middle">${valueFmt(r.value)}</text>
+      <text class="axis-label" x="${x+w/2}" y="${padT+plotH+18}" text-anchor="middle">${r.label}</text>
+    `;
+  });
+
+  el.innerHTML = `<svg class="chart" viewBox="0 0 ${W} ${height}" role="img" aria-label="Bar chart">${grid}${bars}
+    <line class="baseline" x1="${padL}" y1="${padT+plotH}" x2="${padL+plotW}" y2="${padT+plotH}"></line>
+  </svg>`;
+
+  el.querySelectorAll('.bar-rect').forEach(rect=>{
+    const r = rows[+rect.dataset.i];
+    rect.addEventListener('mousemove', e=>showTip(e.clientX, e.clientY, `<b>${r.label}</b><br>${valueFmt(r.value)}`));
+    rect.addEventListener('mouseleave', hideTip);
+  });
+}
+
+// ================= generic categorical bar chart (identity colors) =================
+function vBarCategorical(containerId, rows, {valueFmt=v=>v, height=220, colors=['--accent','--s2','--s3','--s4']} = {}){
+  const el = document.getElementById(containerId);
+  const W = 620, padL = 46, padR = 10, padT = 10, padB = 28;
+  const plotW = W - padL - padR, plotH = height - padT - padB;
+  const max = Math.max(...rows.map(r=>Math.abs(r.value))) * 1.2;
+  const bw = plotW / rows.length;
+  const gridN = 4;
+
+  let grid = '';
+  for(let g=0; g<=gridN; g++){
+    const y = padT + plotH - (g/gridN)*plotH;
+    grid += `<line class="grid-line" x1="${padL}" y1="${y}" x2="${padL+plotW}" y2="${y}"></line>
+      <text class="axis-label" x="${padL-8}" y="${y+3}" text-anchor="end">${(max*g/gridN).toFixed(0)}%</text>`;
+  }
+
+  let bars = '';
+  rows.forEach((r,i)=>{
+    const bh = (Math.abs(r.value)/max) * plotH;
+    const x = padL + i*bw + bw*0.18;
+    const w = bw*0.64;
+    const y = padT + plotH - bh;
+    bars += `
+      <rect class="bar-rect" data-i="${i}" x="${x}" y="${y}" width="${w}" height="${Math.max(bh,2)}" rx="3" fill="var(${colors[i%colors.length]})"></rect>
+      <text class="bar-label" x="${x+w/2}" y="${y-6}" text-anchor="middle">${valueFmt(r.value)}</text>
+      <text class="axis-label" x="${x+w/2}" y="${padT+plotH+18}" text-anchor="middle">${r.label}</text>
+    `;
+  });
+
+  el.innerHTML = `<svg class="chart" viewBox="0 0 ${W} ${height}" role="img" aria-label="Bar chart">${grid}${bars}
+    <line class="baseline" x1="${padL}" y1="${padT+plotH}" x2="${padL+plotW}" y2="${padT+plotH}"></line>
+  </svg>`;
+
+  el.querySelectorAll('.bar-rect').forEach(rect=>{
+    const r = rows[+rect.dataset.i];
+    rect.addEventListener('mousemove', e=>showTip(e.clientX, e.clientY, `<b>${r.label}</b><br>${valueFmt(r.value)}${r.sub?'<br>'+r.sub:''}`));
+    rect.addEventListener('mouseleave', hideTip);
+  });
+}
+
+// ================= line chart =================
+function lineChart(containerId, points, {valueFmt=v=>v, height=170, colorVar='--accent'} = {}){
+  const el = document.getElementById(containerId);
+  const W = 900, padL = 54, padR = 14, padT = 14, padB = 22;
+  const plotW = W - padL - padR, plotH = height - padT - padB;
+  const vals = points.map(p=>p.value);
+  const min = Math.min(0, ...vals), max = Math.max(...vals);
+  const range = (max-min) || 1;
+  const x = i => padL + (i/(points.length-1)) * plotW;
+  const y = v => padT + plotH - ((v-min)/range)*plotH;
+
+  const gridN = 3;
+  let grid = '';
+  for(let g=0; g<=gridN; g++){
+    const vy = min + (g/gridN)*range;
+    const yy = y(vy);
+    grid += `<line class="grid-line" x1="${padL}" y1="${yy}" x2="${padL+plotW}" y2="${yy}"></line>
+      <text class="axis-label" x="${padL-8}" y="${yy+3}" text-anchor="end">${valueFmt(vy)}</text>`;
+  }
+
+  const zeroY = y(0);
+  let path = points.map((p,i)=> (i===0?'M':'L') + x(i).toFixed(1) + ' ' + y(p.value).toFixed(1)).join(' ');
+
+  let xLabels = '';
+  points.forEach((p,i)=>{
+    if(i%6===0 || i===points.length-1){
+      xLabels += `<text class="axis-label" x="${x(i)}" y="${height-4}" text-anchor="middle">${p.label}</text>`;
+    }
+  });
+
+  let dots = '';
+  points.forEach((p,i)=>{
+    dots += `<circle class="hover-target" data-i="${i}" cx="${x(i)}" cy="${y(p.value)}" r="9"></circle>`;
+  });
+
+  el.innerHTML = `<svg class="chart" viewBox="0 0 ${W} ${height}" role="img" aria-label="Line chart">
+      ${grid}
+      <line class="baseline" x1="${padL}" y1="${zeroY}" x2="${padL+plotW}" y2="${zeroY}"></line>
+      <path d="${path}" fill="none" stroke="var(${colorVar})" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+      ${xLabels}
+      ${dots}
+    </svg>`;
+
+  el.querySelectorAll('.hover-target').forEach(dot=>{
+    const p = points[+dot.dataset.i];
+    dot.addEventListener('mousemove', e=>showTip(e.clientX, e.clientY, `<b>${p.label}</b><br>${valueFmt(p.value)}`));
+    dot.addEventListener('mouseleave', hideTip);
+  });
+}
+// ---------- build: Overview ----------
+lineChart('chart-sales-trend', DATA.monthly.map(m=>({label:m.ym.slice(2), value:m.sales})), {valueFmt:fmt.moneyK, colorVar:'--accent'});
+lineChart('chart-profit-trend', DATA.monthly.map(m=>({label:m.ym.slice(2), value:m.profit})), {valueFmt:fmt.moneyK, colorVar:'--s3'});
+
+// ---------- build: Product Profitability ----------
+hBarDiverging('chart-subcat', DATA.subcat.map(r=>({
+  label:r.sub_category, value:r.margin, sub:`${fmt.money(r.sales)} sales · ${fmt.money(r.profit)} profit`
+})), {valueFmt:fmt.pct, height:20, gap:7, labelWidth:110});
+(function(){
+  const el = document.getElementById('table-region-cat');
+  const rows = DATA.region_category.slice().sort((a,b)=>a.profit-b.profit);
+  el.innerHTML = `<table class="data"><thead><tr>
+      <th>Region</th><th>Category</th><th class="num">Sales</th><th class="num">Profit</th>
+    </tr></thead><tbody>
+    ${rows.map(r=>`<tr>
+      <td>${r.region}</td><td>${r.category}</td>
+      <td class="num">${fmt.moneyK(r.sales)}</td>
+      <td class="num ${r.profit<0?'neg-text':''}">${fmt.moneyK(r.profit)}</td>
+    </tr>`).join('')}
+    </tbody></table>`;
+})();
+
+(function(){
+  const el = document.getElementById('table-states');
+  el.innerHTML = `<table class="data"><thead><tr>
+      <th>State</th><th>Region</th><th class="num">Sales</th><th class="num">Profit</th>
+    </tr></thead><tbody>
+    ${DATA.states.map(r=>`<tr>
+      <td class="name">${r.state}</td><td>${r.region}</td>
+      <td class="num">${fmt.moneyK(r.sales)}</td>
+      <td class="num neg-text">${fmt.moneyK(r.profit)}</td>
+    </tr>`).join('')}
+    </tbody></table>`;
+})();
+// ---------- build: Discounting ----------
+hBarDiverging('chart-discount', DATA.discount_tiers.map(r=>({
+  label:r.tier, value:r.margin, sub:`${r.n.toLocaleString()} orders · ${fmt.money(r.sales)} sales`
+})), {valueFmt:fmt.pct, height:30, gap:14, labelWidth:120});
+
+// ---------- build: Customers & Fulfillment ----------
+vBarCategorical('chart-segment', DATA.segment.map(r=>({label:r.segment, value:r.margin, sub:`${r.customers} customers · ${fmt.money(r.profit)} profit`})),
+  {valueFmt:v=>v.toFixed(1)+'%', colors:['--accent','--s2','--s3']});
+
+vBarSingle('chart-shipmode', DATA.ship_mode.map(r=>({label:r.mode.replace(' Class',''), value:r.avg_days, sub:`${r.n.toLocaleString()} orders`})),
+  {valueFmt:v=>v.toFixed(1)+'d', tickFmt:v=>v.toFixed(0)+'d', colorVar:'--accent'});
+(function(){
+  const el = document.getElementById('table-customers');
+  el.innerHTML = `<table class="data"><thead><tr>
+      <th>Customer</th><th class="num">Orders</th><th class="num">Sales</th><th class="num">Profit</th>
+    </tr></thead><tbody>
+    ${DATA.top_customers.map(r=>`<tr>
+      <td class="name">${r.name}</td>
+      <td class="num">${r.orders}</td>
+      <td class="num">${fmt.money(r.sales)}</td>
+      <td class="num pos-text">${fmt.money(r.profit)}</td>
+    </tr>`).join('')}
+    </tbody></table>`;
+})();
+</script>
